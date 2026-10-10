@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Respiratory System Histology Quiz</title>
+<style>
+:root{font-family:Arial,sans-serif;color:#182230;background:#f4f7fb}
+body{margin:0;padding:18px}.wrap{max-width:760px;margin:auto}.card{background:white;border:1px solid #dce3ec;border-radius:18px;padding:22px;box-shadow:0 4px 18px #1720330b}
+h1{font-size:1.45rem;margin:0 0 6px}.sub{color:#637083;font-size:.95rem}.top{display:flex;justify-content:space-between;gap:12px;align-items:center}.pill{background:#e8eefb;border-radius:20px;padding:7px 11px;font-size:.85rem}
+.track{height:7px;background:#e5eaf1;border-radius:9px;overflow:hidden;margin:18px 0}.bar{height:100%;background:#3159c9;width:0}
+.topic{color:#596579;font-size:.9rem;margin:15px 0 8px}.question{font-size:1.2rem;line-height:1.45;margin:0 0 16px}
+.option{display:flex;gap:10px;padding:13px;border:1px solid #dce3ec;border-radius:12px;margin:9px 0;cursor:pointer;line-height:1.35}.option:has(input:checked){border-color:#3159c9;background:#f0f4ff}.option input{margin-top:3px;accent-color:#3159c9}
+.buttons{display:flex;gap:10px;margin-top:18px;flex-wrap:wrap}button{border:0;border-radius:11px;padding:12px 16px;font-size:1rem;cursor:pointer;background:#3159c9;color:white;flex:1}button.secondary{background:#e9edf4;color:#243044}button:disabled{opacity:.45;cursor:not-allowed}
+.result{text-align:center;padding:18px;background:#f5f7fb;border-radius:14px;margin:16px 0}.reviewitem{border-top:1px solid #e0e5ed;padding:14px 0;line-height:1.45}.correct{color:#167544}.wrong{color:#b42318}.small{font-size:.9rem;color:#637083}
+@media(max-width:480px){body{padding:10px}.card{padding:16px}.question{font-size:1.08rem}}
+</style>
+</head>
+<body><div class="wrap"><div class="card">
+<div class="top"><div><h1>Respiratory System — Histology Quiz</h1><div class="sub">Interactive MCQ • 40 questions</div></div><div class="pill" id="counter">Question 1 / 40</div></div>
+<div class="track"><div class="bar" id="bar"></div></div>
+<div id="quiz"><div class="topic" id="topic"></div><h2 class="question" id="question"></h2><div id="options"></div>
+<div class="buttons"><button class="secondary" id="prev">Previous</button><button id="next">Next</button></div><p class="small">Choose one answer. You can go back and change answers before submitting.</p></div>
+<div id="results" hidden></div>
+</div></div>
+<script>
+const qs = [
+["Nasal cavity & olfactory mucosa","The vestibule of the nose is lined by:",["Simple cuboidal epithelium","Keratinized stratified squamous epithelium","Pseudostratified ciliated columnar epithelium","Non-keratinized stratified squamous epithelium"],1,"The nasal vestibule is lined by thin skin containing short hairs, sebaceous glands and sweat glands."],
+["Nasal cavity & olfactory mucosa","The olfactory area is mainly located in the:",["Inferior concha and floor","Roof, superior nasal septum and superior concha","Nasal vestibule","Oropharynx"],1,"These are the main locations of the olfactory mucosa."],
+["Nasal cavity & olfactory mucosa","Olfactory sensory cells are:",["Multipolar nerve cells","Bipolar nerve cells","Unipolar nerve cells","Non-neural epithelial cells"],1,"Olfactory receptor cells are bipolar neurons specialized for smell."],
+["Nasal cavity & olfactory mucosa","The apical dendrite of an olfactory cell forms the:",["Lamellar body","Olfactory vesicle","Goblet cell","Basal body of a motile cilium"],1,"The dendrite ends in an olfactory vesicle that projects above the supporting cells."],
+["Nasal cavity & olfactory mucosa","Which olfactory cells are the most numerous?",["Basal cells","Olfactory sensory cells","Sustentacular cells","Goblet cells"],2,"Sustentacular cells provide physical support, nourishment and electrical insulation."],
+["Nasal cavity & olfactory mucosa","Which cells act as stem cells and can replace olfactory and sustentacular cells?",["Horizontal basal cells only","Globose basal cells","Mature olfactory cells","Bowman's gland cells"],1,"Globose basal cells have considerable proliferative capacity."],
+["Nasal cavity & olfactory mucosa","Bowman's glands are found in the:",["Epithelium","Lamina propria","Cartilage","Periosteum only"],1,"The lamina propria contains serous olfactory glands, axons and lymphoid elements."],
+["Paranasal sinuses & pharynx","The paranasal sinuses include all EXCEPT:",["Frontal","Ethmoid","Sphenoid","Temporal"],3,"The four groups are frontal, ethmoid, sphenoid and maxillary."],
+["Paranasal sinuses & pharynx","The nasopharynx is lined by:",["Keratinized stratified squamous epithelium","Pseudostratified ciliated columnar epithelium with goblet cells","Simple squamous epithelium","Simple cuboidal epithelium"],1,"Its lamina propria contains seromucous glands and the pharyngeal tonsil."],
+["Paranasal sinuses & pharynx","The oropharynx is lined by:",["Respiratory epithelium","Simple columnar epithelium","Non-keratinized stratified squamous epithelium","Simple cuboidal epithelium"],2,"This lining protects against abrasion from food."],
+["Larynx & respiratory epithelium","The true vocal cords are covered by:",["Pseudostratified ciliated columnar epithelium","Non-keratinized stratified squamous epithelium","Simple cuboidal epithelium","Simple squamous epithelium"],1,"The true vocal folds have non-keratinized stratified squamous epithelium."],
+["Larynx & respiratory epithelium","Which laryngeal cartilage is elastic?",["Thyroid","Cricoid","Epiglottis","Most of the inferior arytenoid"],2,"The epiglottis is made of elastic cartilage; thyroid and cricoid are hyaline."],
+["Larynx & respiratory epithelium","Typical respiratory epithelium is:",["Simple squamous epithelium","Simple cuboidal epithelium","Pseudostratified ciliated columnar epithelium with goblet cells","Keratinized stratified squamous epithelium"],2,"It lines most of the conducting respiratory tract, with important exceptions."],
+["Larynx & respiratory epithelium","Which is NOT a cell type of typical respiratory epithelium?",["Ciliated columnar cell","Goblet cell","Brush cell","Type I pneumocyte"],3,"Type I pneumocytes belong to the alveolar epithelium."],
+["Larynx & respiratory epithelium","Brush cells are associated with:",["Surfactant storage","Sensory nerve endings and sensory functions","Cartilage formation","Phagocytosis of alveolar dust"],1,"The lecture describes brush cells as having a sensory role in cough and sneeze reflexes."],
+["Larynx & respiratory epithelium","DNES (Kulchitsky) cells monitor:",["Blood glucose","O₂ and CO₂ levels in the airway lumen","Blood pressure only","Pleural fluid volume"],1,"These cells contain dense-core granules and are associated with sensory nerve endings."],
+["Trachea","The tracheal supporting layer contains approximately:",["4–8 complete rings","10–12 elastic rings","16–20 C-shaped hyaline cartilage rings","25–30 bone rings"],2,"The C-shaped rings are embedded in dense irregular fibroelastic connective tissue."],
+["Trachea","The posterior ends of tracheal cartilage rings are connected by:",["Cardiac muscle","Trachealis smooth muscle","Skeletal muscle","Elastic cartilage"],1,"The trachealis muscle bridges the open posterior ends of the C-rings."],
+["Trachea","Which layer of the trachea contains numerous mucous and seromucous glands?",["Epithelium only","Submucosa","Cartilage only","Mesothelium"],1,"The submucosa contains areolar connective tissue, vessels, nerves, glands and lymphoid elements."],
+["Lungs & bronchi","Which statement about the lobes of the lungs is correct according to the lecture?",["Right: 2; Left: 3","Right: 3; Left: 2","Both have 3 lobes","Both have 2 lobes"],1,"The lecture lists three lobes on the right and two on the left."],
+["Lungs & bronchi","The bronchial tree begins at the:",["Larynx","Pharynx","Bifurcation of the trachea","Alveolar duct"],2,"The trachea divides into right and left primary bronchi."],
+["Lungs & bronchi","Compared with intrapulmonary bronchi, extrapulmonary bronchi have:",["Multiple cartilage plates","A complete smooth muscle ring under the mucosa","C-shaped cartilage rings and a well-developed submucosa","No goblet cells"],2,"Extrapulmonary bronchi have larger diameter, less folded mucosa, many goblet cells and C-shaped rings."],
+["Lungs & bronchi","In intrapulmonary bronchi, smooth muscle is arranged:",["Only at the posterior wall","Spirally, forming a ring under the mucosa","Inside the cartilage matrix","Only in the adventitia"],1,"The lecture contrasts this arrangement with the posterior trachealis muscle arrangement of extrapulmonary bronchi."],
+["Bronchioles & Clara cells","A key feature of bronchioles is the absence of:",["Smooth muscle","Elastic fibers","Cartilage","Epithelium"],2,"Bronchioles have mucosa, a smooth muscle layer and connective tissue, but no cartilage."],
+["Bronchioles & Clara cells","The epithelium of smaller bronchioles is mainly:",["Simple cuboidal","Keratinized stratified squamous","Simple squamous","Pseudostratified with abundant goblet cells"],0,"Smaller bronchioles have simple cuboidal epithelium, occasional Clara cells and no goblet cells."],
+["Bronchioles & Clara cells","Clara (club) cells are typically:",["Ciliated cells with flat apices","Columnar cells with dome-shaped apices and no cilia","Flat squamous cells in alveoli","Cartilage-forming cells"],1,"Their apices project into the lumen; their cytoplasm contains secretory granules."],
+["Bronchioles & Clara cells","Which is NOT a function of Clara cells?",["Protect bronchiolar epithelium","Produce surfactant-like material","Regenerate bronchiolar epithelium","Form the blood-air barrier as its main component"],3,"Their functions include epithelial protection, reducing surface tension and regeneration."],
+["Respiratory portion","Which structure is part of the respiratory portion?",["Terminal bronchiole","Trachea","Respiratory bronchiole","Primary bronchus"],2,"The respiratory portion consists of respiratory bronchioles, alveolar ducts, alveolar sacs and alveoli."],
+["Respiratory portion","Gas exchange first becomes possible in the:",["Terminal bronchiole","Respiratory bronchiole","Trachea","Primary bronchus"],1,"Respiratory bronchioles have alveoli interrupting their walls."],
+["Respiratory portion","Alveolar ducts are best described as:",["Thick cartilage tubes","Linear arrangements of alveoli","Glands in the lamina propria","Tubes with no alveoli"],1,"The lecture describes alveolar ducts and related spaces as arrangements of alveoli."],
+["Alveoli & interalveolar septum","Which is one of the five main cell types listed in the interalveolar septum?",["Goblet cells","Capillary endothelial cells","Trachealis cells","Olfactory sensory cells"],1,"Other groups include type I and II pneumocytes, interstitial cells and alveolar macrophages."],
+["Alveoli & interalveolar septum","Alveolar pores allow:",["Cartilage growth","Communication between adjacent alveoli and pressure equalization","Mucus production","Movement of cilia"],1,"They may also provide collateral ventilation when bronchioles are obstructed."],
+["Alveoli & pneumocytes","Type I pneumocytes cover approximately what percentage of the alveolar surface?",["16%","36%","50%","97%"],3,"The lecture states that Type I pneumocytes cover about 97% of the alveolar surface."],
+["Alveoli & pneumocytes","The main function of Type I pneumocytes is:",["Surfactant production","Gas exchange","Mucus secretion","Dust phagocytosis"],1,"They are thin squamous cells specialized for gas exchange and cannot divide."],
+["Alveoli & pneumocytes","The most distinguishing feature of Type II pneumocytes is:",["Motile cilia","Lamellar bodies","C-shaped cartilage","Olfactory vesicles"],1,"Lamellar bodies store pulmonary surfactant."],
+["Alveoli & pneumocytes","Type II pneumocytes can:",["Never undergo mitosis","Act as progenitor cells for Type I and Type II pneumocytes","Only form macrophages","Form tracheal cartilage"],1,"Type II cells divide and can replace both types of pneumocytes."],
+["Blood-air barrier & macrophages","The blood-air barrier consists of:",["Type II cells, cartilage and smooth muscle","Type I alveolar cells, basement membrane and capillary endothelial cells","Goblet cells and macrophages only","Pleura and connective tissue only"],1,"These structures separate alveolar air from blood in pulmonary capillaries."],
+["Blood-air barrier & macrophages","Alveolar macrophages containing hemosiderin are called:",["Dust cells","Heart failure cells","Kulchitsky cells","Clara cells"],1,"The lecture associates hemosiderin-containing macrophages with heart failure."],
+["Pleura","The pleura is covered by:",["Endothelium","Mesothelium","Respiratory epithelium","Keratinized stratified squamous epithelium"],1,"The pleura consists of fibrous connective tissue covered by mesothelium and secretes pleural fluid."]
+];
+let idx=0, answers={};
+const $=id=>document.getElementById(id);
+function render(){
+  $("counter").textContent=`Question ${idx+1} / ${qs.length}`;
+  $("bar").style.width=`${(idx+1)/qs.length*100}%`;
+  $("topic").textContent=qs[idx][0];
+  $("question").textContent=qs[idx][1];
+  $("options").innerHTML="";
+  qs[idx][2].forEach((opt,i)=>{
+    const label=document.createElement("label");label.className="option";
+    const radio=document.createElement("input");radio.type="radio";radio.name="answer";radio.value=i;radio.checked=answers[idx]===i;
+    radio.addEventListener("change",()=>answers[idx]=i);
+    const span=document.createElement("span");span.textContent=String.fromCharCode(65+i)+". "+opt;
+    label.append(radio,span);$("options").append(label);
+  });
+  $("prev").disabled=idx===0;
+  $("next").textContent=idx===qs.length-1?"Submit & grade":"Next";
+}
+$("prev").addEventListener("click",()=>{if(idx>0){idx--;render()}});
+$("next").addEventListener("click",()=>{if(idx<qs.length-1){idx++;render()}else showResults()});
+function showResults(){
+  let score=0;qs.forEach((q,i)=>{if(answers[i]===q[3])score++});
+  $("quiz").hidden=true;$("results").hidden=false;
+  let out=`<div class="result"><h2>${score} / ${qs.length}</h2><p>${Math.round(score/qs.length*100)}% correct</p><p>${score/qs.length>=.9?"Excellent!":score/qs.length>=.7?"Good work — review the missed questions.":"Review the explanations and try again."}</p></div><button id="toggleReview" class="secondary">Show answers & explanations</button><div id="review" hidden>`;
+  qs.forEach((q,i)=>{
+    const chosen=answers[i], ok=chosen===q[3];
+    out+=`<div class="reviewitem"><strong>Q${i+1}. ${q[1]}</strong><p class="${ok?'correct':'wrong'}">${chosen===undefined?'Not answered.':`Your answer: ${String.fromCharCode(65+chosen)}. ${q[2][chosen]}`}</p><p class="correct"><strong>Correct answer:</strong> ${String.fromCharCode(65+q[3])}. ${q[2][q[3]]}</p><p>${q[4]}</p></div>`;
+  });
+  out+=`</div><button id="restart" style="margin-top:14px">Restart quiz</button>`;
+  $("results").innerHTML=out;
+  $("toggleReview").addEventListener("click",()=>{const r=$("review");r.hidden=!r.hidden;$("toggleReview").textContent=r.hidden?"Show answers & explanations":"Hide answers & explanations"});
+  $("restart").addEventListener("click",()=>{idx=0;answers={};$("results").hidden=true;$("quiz").hidden=false;render();window.scrollTo(0,0)});
+  window.scrollTo(0,0);
+}
+render();
+</script></body></html>
